@@ -1,6 +1,10 @@
 # field
 
-A sub-command-based argument parsing library for C++.
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/jibstack64/field)
+![GitHub all releases](https://img.shields.io/github/downloads/jibstack64/field/total)
+![GitHub](https://img.shields.io/github/license/jibstack64/field)
+
+*A sub-command-based argument parsing library for C++.*
 
 ### Information
 `field` is *not* a replacement for [argh!](https://github.com/adishavit/argh) and similar libraries, it is for use in specific types of programs, as described below.
