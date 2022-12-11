@@ -80,7 +80,7 @@ For instance, if I wanted a basic mirroring program:
 
 #include ".../field.hpp"
 
-// this is ran when "hello-world" is passed
+// this is ran when "mirror" is passed
 void mirror(field::context& _, std::vector<const char *> text) {
     for (const auto& c : text) {
         std::cout << c << std::endl;
