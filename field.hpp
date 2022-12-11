@@ -28,12 +28,17 @@ namespace field {
         void flag(field::context& ctx) {}
     }
 
-    struct arg {        
+    struct arg {       
+        private:
+        std::vector<const char *> finalValues_{};
+
         public:
         const std::function<void(context&, std::vector<const char *>)> runnable;
         const int takes;
         const char * name;
         bool passed = false;
+
+        std::vector<const char *> values();
 
         void run(context& ctx, std::vector<const char *> values);
         void run(context& ctx, const char * value);
@@ -54,8 +59,13 @@ namespace field {
     //
     arg::arg(const char * name) : name(name), runnable(tlt::arg), takes(-1) {}
     //
+    std::vector<const char *> arg::values() {
+        return finalValues_;
+    }
+    //
     void arg::run(context& ctx, std::vector<const char *> values) {
         passed = true;
+        finalValues_ = values;
         runnable(ctx, values);
     }
     //
@@ -87,13 +97,18 @@ namespace field {
     struct context {
         public:
         std::vector<flag*> passedFlags;
+        std::vector<const char *> overflowValues;
 
-        context(std::vector<flag*> passedFlags);
-        context(std::initializer_list<flag*> passedFlags);
+        context(std::vector<flag*> passedFlags, std::vector<const char *> overflowValues);
+        context(std::initializer_list<flag*> passedFlags, std::initializer_list<const char *> overflowValues);
+        context();
     };
     //
-    context::context(std::vector<flag*> passedFlags) : passedFlags(passedFlags) {}
-    context::context(std::initializer_list<flag*> passedFlags) : passedFlags(passedFlags) {}
+    context::context(std::vector<flag*> passedFlags, std::vector<const char *> overflowValues) : passedFlags(passedFlags),
+            overflowValues(overflowValues) {}
+    context::context(std::initializer_list<flag*> passedFlags, std::initializer_list<const char *> overflowValues) :
+            passedFlags(passedFlags), overflowValues(overflowValues) {}
+    context::context() : passedFlags({}), overflowValues({}) {}
 
     class parser {
         private:
@@ -102,6 +117,7 @@ namespace field {
 
         public:
         bool disableLock;
+        context ctx;
 
         arg* parse(int argc, char ** argv);
         arg* parse(char ** argv);
@@ -112,6 +128,7 @@ namespace field {
 
         arg* add(const char * name, std::function<void(context&, std::vector<const char *>)> run, int takes);
         arg* add(const char * name, std::function<void(context&, std::vector<const char *>)> run);
+        arg* add(const char * name, int takes);
         arg* add(const char * name);
         void add(arg& ar);
 
@@ -119,7 +136,7 @@ namespace field {
         flag* addFlag(const char * name);
         void addFlag(flag& fl);
 
-        context getContext();
+        context formContext(std::vector<const char *> overflowValues);
 
         parser();
         parser(std::initializer_list<arg> args);
@@ -133,6 +150,7 @@ namespace field {
     arg* parser::parse(int argc, char ** argv) {
         arg* main = nullptr; // the sub-command found
         std::vector<flag*> flagsToRun;
+        std::vector<const char *> overflowValues;
         std::vector<const char *> values; // final values to be passed to main->run(...)
         for (int i = 1; i < argc; i++) {
             flag* fl = getFlag(argv[i]);
@@ -163,8 +181,10 @@ namespace field {
                 }
                 continue;
             }
+            // if not a flag, arg or value
+            overflowValues.push_back(argv[i]);
         }
-        context ctx = getContext();
+        ctx = formContext(overflowValues);
         // then run
         for (auto& fl : flagsToRun) {
             fl->run(ctx);
@@ -201,14 +221,14 @@ namespace field {
         return nullptr;
     }
     //
-    context parser::getContext() {
+    context parser::formContext(std::vector<const char *> overflowValues) {
         std::vector<flag*> passedFlags;
         for (auto& fl : flags_) {
             if (fl.passed) {
                 passedFlags.push_back(&fl);
             }
         }
-        context ctx(passedFlags);
+        context ctx(passedFlags, overflowValues);
         return ctx;
     }
     //
@@ -220,6 +240,12 @@ namespace field {
     //
     arg* parser::add(const char * name, std::function<void(context&, std::vector<const char *>)> run) {
         arg newArg(name, run);
+        args_.push_back(newArg);
+        return &args_.back();
+    }
+    //
+    arg* parser::add(const char * name, int takes) {
+        arg newArg(name, takes);
         args_.push_back(newArg);
         return &args_.back();
     }
