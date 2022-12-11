@@ -1,6 +1,6 @@
 # field
 
-A subcommand-based argument parsing library for C++.
+A sub-command-based argument parsing library for C++.
 
 ### Information
 `field` is *not* a replacement for [argh!](https://github.com/adishavit/argh) and similar libraries, it is for use in specific types of programs, as described below.
