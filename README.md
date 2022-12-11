@@ -13,7 +13,7 @@
 
 > If you insist on using `field` for multi-argument parsing, you may set `parser.disableLock` to true. This will allow multiple subcommands to be used, instead of locking to one.
 
-For example, say you are developing a package manager that is solely controlled using command-line arguments. When installing a package, you want the command-line syntax looks something like this:
+For example, say you are developing a package manager that is solely controlled using command-line arguments. When installing a package, you want the command-line syntax to look something like this:
 
 `package-manager install <package>`
 
