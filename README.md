@@ -113,6 +113,8 @@ very
 
 As you can see, `cool` was cut off due to the `takes` (number of taken values) being `3`.
 
+---
+
 ### Flags
 
 Flags can be named in any way you would prefer, however I recommend using the GNU-style `-` and `--` prefixes to distinguish them from sub-commands.
