@@ -73,7 +73,7 @@ and FOSS developers!!!
 ---
 
 ### Context
-Context (`field::context`) is passed to every "runner" function (a function that is called when an argument is passed). It contains a list of flags passed, and any values passed outside of the boundaries of the argument.
+Context (`field::context`) is passed to every function bound to an subcommand/flag if it is passed. It contains a list of flags passed, and any values passed outside of the range of positional arguments.
 
 ---
 
@@ -162,7 +162,7 @@ hello world!
 ### Hate using functions?
 If you would rather not pass functions around, and instead have a series of if statements, you can do that too.
 
-Instead of passing a function, only pass a name, and store the pointer to the argument provided:
+Instead of passing a function, only pass a name (and optionally `takes`).
 ```cpp
 #include ".../field.hpp"
 
@@ -170,7 +170,7 @@ int main(int argc, char ** argv) {
     field::parser parser;
     
     // no function passed
-    field::arg* ar = parser.add("no-func");
+    field::arg* ar = parser.add("no-func", 2);
 
     parser.parse();
 
@@ -192,6 +192,7 @@ int main(int argc, char ** argv) {
 
 ```
 
-As you can see, this allows you to access the `passed` boolean of the argument, and run code based on if statements, rather than providing a function to be ran.
+As you can see, this allows you to access the `passed` boolean of the argument, and manage code based on if statements.
 
-*Not only this*, you can access the context outside of a function by accessing the `ctx` variables of your `parser`.
+Not only this, you can access the context outside of a function by accessing the `ctx` variable of your `parser`.
+It is the equivalent of using the context variable passed to a function.
